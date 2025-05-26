@@ -4,14 +4,12 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Chatbot } from "@/components/chatbot"
-import { DeploymentStatus } from "@/components/deployment-status"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "PropertyHub - Find Your Dream Property",
-  description:
-    "Discover, buy, sell, and rent properties with ease. Your trusted real estate platform with government-certified data.",
+  description: "Discover the perfect property with our comprehensive real estate platform",
     generator: 'v0.dev'
 }
 
@@ -26,7 +24,6 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
           <Chatbot />
-          {process.env.NODE_ENV === "production" && <DeploymentStatus />}
         </ThemeProvider>
       </body>
     </html>

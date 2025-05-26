@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static exports for better deployment
-  output: "standalone",
-
   // Optimize images
   images: {
     domains: ["images.unsplash.com", "via.placeholder.com"],
@@ -20,11 +17,6 @@ const nextConfig = {
     serverComponentsExternalPackages: ["leaflet"],
   },
 
-  // Environment variables - only expose safe ones to client
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-  },
-
   // Webpack configuration
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -36,32 +28,6 @@ const nextConfig = {
       }
     }
     return config
-  },
-
-  // Headers for better caching
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-    ]
-  },
-
-  // Redirects
-  async redirects() {
-    return [
-      {
-        source: "/dashboard",
-        destination: "/dashboard/overview",
-        permanent: true,
-      },
-    ]
   },
 
   // ESLint configuration
