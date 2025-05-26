@@ -8,10 +8,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Real Estate Platform",
-  description: "Find your dream property with our comprehensive real estate platform",
-  keywords: "real estate, property, buy, sell, rent, luxury homes",
-  authors: [{ name: "Real Estate Platform Team" }],
-  viewport: "width=device-width, initial-scale=1",
+  description: "Find your dream property",
     generator: 'v0.dev'
 }
 
