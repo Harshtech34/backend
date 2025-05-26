@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Chatbot } from "@/components/chatbot"
+import { DeploymentStatus } from "@/components/deployment-status"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,6 +26,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
           <Chatbot />
+          {process.env.NODE_ENV === "production" && <DeploymentStatus />}
         </ThemeProvider>
       </body>
     </html>

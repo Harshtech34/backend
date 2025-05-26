@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Maximize2, Minimize2, Navigation } from "lucide-react"
+import { MapPin, Maximize2, Minimize2, Navigation, Loader2 } from "lucide-react"
+import { getMapConfig, getPropertyLocations } from "@/lib/actions/map-actions"
 
 interface Property {
   id: string
@@ -19,39 +20,51 @@ interface Property {
   status: string
 }
 
-const sampleProperties: Property[] = [
-  {
-    id: "1",
-    title: "Luxury Apartment",
-    price: "₹1.2 Cr",
-    location: "Bandra West, Mumbai",
-    coordinates: { lat: 19.0596, lng: 72.8295 },
-    type: "Apartment",
-    status: "Available",
-  },
-  {
-    id: "2",
-    title: "Modern Villa",
-    price: "₹3.5 Cr",
-    location: "Whitefield, Bangalore",
-    coordinates: { lat: 12.9698, lng: 77.75 },
-    type: "Villa",
-    status: "Available",
-  },
-  {
-    id: "3",
-    title: "Commercial Space",
-    price: "₹80 L",
-    location: "Connaught Place, Delhi",
-    coordinates: { lat: 28.6315, lng: 77.2167 },
-    type: "Commercial",
-    status: "Available",
-  },
-]
+interface MapConfig {
+  center: {
+    lat: number
+    lng: number
+  }
+  zoom: number
+  style: string
+}
 
 export function PropertyMap() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [properties, setProperties] = useState<Property[]>([])
+  const [mapConfig, setMapConfig] = useState<MapConfig | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadMapData() {
+      try {
+        setLoading(true)
+        const [config, propertyData] = await Promise.all([getMapConfig(), getPropertyLocations()])
+        setMapConfig(config)
+        setProperties(propertyData)
+      } catch (error) {
+        console.error("Failed to load map data:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadMapData()
+  }, [])
+
+  if (loading) {
+    return (
+      <Card className="h-96">
+        <CardContent className="p-0 h-full flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+            <p className="text-muted-foreground">Loading map...</p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className={`${isFullscreen ? "fixed inset-4 z-50" : "h-96"} transition-all duration-300`}>
@@ -60,7 +73,7 @@ export function PropertyMap() {
         <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-center">
           <Badge className="bg-background/80 backdrop-blur-sm text-foreground">
             <MapPin className="w-3 h-3 mr-1" />
-            {sampleProperties.length} Properties
+            {properties.length} Properties
           </Badge>
           <div className="flex gap-2">
             <Button
@@ -79,11 +92,20 @@ export function PropertyMap() {
           {/* Simulated Map Background */}
           <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-green-100 dark:from-blue-900/20 dark:to-green-900/20">
             {/* Grid Pattern */}
-            <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-20" />
+            <div className="absolute inset-0 opacity-20">
+              <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.3" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+              </svg>
+            </div>
           </div>
 
           {/* Property Markers */}
-          {sampleProperties.map((property, index) => (
+          {properties.map((property, index) => (
             <div
               key={property.id}
               className="absolute cursor-pointer transform -translate-x-1/2 -translate-y-1/2 z-20"
@@ -123,7 +145,7 @@ export function PropertyMap() {
           {/* Map Placeholder Content */}
           <div className="text-center z-10">
             <Navigation className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground font-medium">Interactive Property Map</p>
+            <p className="text-muted-foreground font-medium">Secure Property Map</p>
             <p className="text-sm text-muted-foreground mt-2">Click on markers to view property details</p>
           </div>
         </div>
